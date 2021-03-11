@@ -216,25 +216,6 @@ How to test the app
 [MIT License](LICENCE)
 ```
 
-## Puppet, DNS, Sentry and beyond
-
-* To prepare the servers for your app, follow the doc in [govuk-puppet]
-* To configure app deployments, follow the docs in [govuk-app-deployment]
-* To enable external DNS, follow the article in the [Developer Docs][dns]
-* Make a PR to add your app to [data/applications.yml][docs-applications] for these docs
-* Then ask 2nd line to run the task in [govuk-saas-config] to update [Sentry]
-* Add the application to the [Release] app (the create button is at the bottom)
-* Add the application to the [Deploy_App job][deploy-jenkins] in Jenkins (click Configure)
-* Run the [Deploy_App job][deploy-jenkins] using with `with_migrations` option to get started
-
-When adding your application to `data/application.yml` - ensure your new repository has
-a description set in the "About" section on github. This will be used to describe what your app
-is on the [application listings](https://docs.publishing.service.gov.uk/#applications) and is also
-required to render an application page.
-
-If you do not do this, you may see Middleman errors when the docs are building which reference
-attempts to modify a frozen empty string.
-
 ## Configuring the app for Jenkins
 
 Create a `Jenkinsfile` in your repo with the following content.
@@ -249,6 +230,19 @@ node {
 }
 ```
 
+@TODO add note for transition master -> main.
+If you are setting up repos with main branches
+
+see example from [account-api](https://github.com/alphagov/account-api/blob/main/Jenkinsfile)
+
+Use different library parameter
+
+```
+library("govuk@default-branch")
+```
+
+Q. Can we just change this to default? will it work with master / main?
+
 You also need to add a Jenkins integration to the repo on GitHub:
 
 1. In GitHub, go to Settings -&gt; Integrations & Services
@@ -257,3 +251,24 @@ You also need to add a Jenkins integration to the repo on GitHub:
 4. Make sure Active is ticked
 
 Finally, add your app to the list of deployable applications in [govuk-puppet].
+
+
+## Puppet, DNS, Sentry and beyond
+
+* To prepare the servers for your app, follow the doc in [govuk-puppet]
+* To configure app deployments, follow the docs in [govuk-app-deployment]
+* To enable external DNS, follow the article in the [Developer Docs][dns]
+* Make a PR to add your app to [data/applications.yml][docs-applications] for these docs
+* Then ask 2nd line to run the task in [govuk-saas-config] to update [Sentry]
+* Add the application to the [Release] app (the create button is at the bottom)
+* Add the application to the [Deploy_App job][deploy-jenkins] in Jenkins (click Configure)
+* Run the [Deploy_App job][deploy-jenkins] using with `with_migrations` option to get started
+* missing step: https://github.com/alphagov/govuk-puppet/pull/10990#pullrequestreview-610028595
+
+When adding your application to `data/application.yml` - ensure your new repository has
+a description set in the "About" section on github. This will be used to describe what your app
+is on the [application listings](https://docs.publishing.service.gov.uk/#applications) and is also
+required to render an application page.
+
+If you do not do this, you may see Middleman errors when the docs are building which reference
+attempts to modify a frozen empty string.

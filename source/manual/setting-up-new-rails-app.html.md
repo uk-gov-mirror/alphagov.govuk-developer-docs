@@ -180,12 +180,10 @@ We have a common structure that is used for GOV.UK apps. Fill in some basic
 details to get started with your app and flesh it out further as your project
 develops.
 
-```markdown
+~~~ markdown
 # App Name
 
 One paragraph description and purpose.
-
-## Screenshots (if there's a client-facing aspect of it)
 
 ## Live examples (if available)
 
@@ -197,24 +195,25 @@ One paragraph description and purpose.
 
 ## Technical documentation
 
-Write a single paragraph including a general technical overview of the app.
+A brief technical overview of the application, explaining how to run it and
+dependencies. For GOV.UK apps that run on GOV.UK Docker the following is ideal:
 
-### Dependencies
+This is a Ruby on Rails app, and should follow [our Rails app conventions](https://docs.publishing.service.gov.uk/manual/conventions-for-rails-applications.html).
 
-- [dependency]() - purpose
+You can use the [GOV.UK Docker environment](https://github.com/alphagov/govuk-docker) to run the application and its tests with all the necessary dependencies. Follow [the usage instructions](https://github.com/alphagov/govuk-docker#usage) to get started.
 
-### Running the application
-
-How to run the app
+**Use GOV.UK Docker to run any commands that follow.**
 
 ### Running the test suite
 
-How to test the app
+```
+bundle exec rake
+```
 
 ## Licence
 
 [MIT License](LICENCE)
-```
+~~~
 
 ## Puppet, DNS, Sentry and beyond
 

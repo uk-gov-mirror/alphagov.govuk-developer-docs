@@ -52,7 +52,7 @@ private
 
   def recursively_fetch_files(repo_name, path)
     docs = client.contents("alphagov/#{repo_name}", path: path)
-    top_level_files = docs.select { |doc| doc.name.end_with?(".md") }.map do |doc|
+    top_level_files = docs.select { |doc| doc.path.end_with?(".md") }.map do |doc|
       contents = HTTP.get(doc.download_url)
       filename = doc.path.sub("docs/", "").match(/(.+)\..+$/)[1]
       title = ExternalDoc.title(contents) || filename

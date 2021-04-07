@@ -15,7 +15,11 @@ This process varies per app and requires
 
 ## Whitehall
 
-If the document is in Whitehall, there is a Rake task you can run:
+If the documents are in Whitehall, there are Rake tasks you can run as outlined below. Try to pick the one most focused to the scope of what you need to republish to avoid unnecesary load. You can monitor the effect on the publishing queue via these dashboards:
+
+- [integration][https://grafana.integration.publishing.service.gov.uk/dashboard/file/sidekiq.json?refresh=1m&orgId=1&var-Application=whitehall&var-Interval=$__auto_interval]
+- [staging][https://grafana.blue.staging.govuk.digital/dashboard/file/sidekiq.json?refresh=1m&orgId=1&var-Application=whitehall&var-Interval=$__auto_interval]
+- [production][https://grafana.blue.production.govuk.digital/dashboard/file/sidekiq.json?refresh=1m&orgId=1&var-Application=whitehall&var-Interval=$__auto_interval]
 
 [`publishing_api:republish_document[slug]`][republish-whitehall-doc-jenkins]
 
@@ -23,7 +27,7 @@ For organisations, run:
 
 [`publishing_api:republish_organisation[slug]`][republish-whitehall-org-jenkins]
 
-for document type, run:
+For all of a single document type, run:
 
 [`publishing_api:bulk_republish:document_type[DocumentClass]`][republish-whitehall-document-type-jenkins]
 
@@ -33,6 +37,19 @@ For example:
 
 You may wish to test first on Integration:
 [`publishing_api:bulk_republish:document_type[DocumentClass]`][republish-whitehall-document-type-jenkins-integration]
+
+For a short list of Content IDs, run:
+[`publishing_api:bulk_republish:republish_documents_by_content_ids[content_id_1 content_id_2]`][republish-whitehall-document-type-jenkins]
+
+For a significant number of Content IDs:
+Some preparation is needed for this as a CSV file needs to be in place. The CSV should have a column called content_id that contains all the relevant IDS. This should be added to the whitehall repository at:
+lib/tasks/{FILENAME}.csv
+[`publishing_api:bulk_republish:republish_documents_by_content_ids_from_csv[csv_file_name]`][republish-whitehall-document-type-jenkins]
+Ensure that the CSV is removed again after the job completes.
+
+To republish all documents:
+Proceed with caution, this is a lot of content and will take hours to complete.
+[`publishing_api:bulk_republish:all`][republish-whitehall-document-type-jenkins]
 
 ## Content Publisher
 

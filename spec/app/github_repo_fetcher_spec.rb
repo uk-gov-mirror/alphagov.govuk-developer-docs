@@ -122,6 +122,12 @@ RSpec.describe GitHubRepoFetcher do
       "https://api.github.com/repos/alphagov/#{repo_name}/contents/docs"
     end
 
+    def github_repo_fetcher_returning(repo)
+      instance = GitHubRepoFetcher.new
+      allow(instance).to receive(:repo).with(repo_name).and_return(repo)
+      instance
+    end
+
     context "the repo contains a reachable docs/ folder" do
       def with_stubbed_client(temporary_client, instance)
         before_client = instance.instance_variable_get(:@client)
@@ -131,18 +137,14 @@ RSpec.describe GitHubRepoFetcher do
       end
 
       let(:commit) { { sha: SecureRandom.hex(40), timestamp: Time.now.utc.to_s } }
-      let(:instance) do
-        instance = GitHubRepoFetcher.new
-        allow(instance).to receive(:latest_commit).and_return(commit)
-        allow(instance).to receive(:repo).with(repo_name).and_return(public_repo)
-        instance
-      end
       let(:doc_contents) { "# title \n Some document" }
       let(:doc_title_derived_from_contents) { "title" }
 
       it "returns an array of hashes including title derived from markdown contents" do
         doc = double("doc", type: "file", download_url: "foo_url", path: "docs/foo.md", html_url: "foo_html_url")
 
+        instance = github_repo_fetcher_returning(public_repo)
+        allow(instance).to receive(:latest_commit).and_return(commit)
         allow(HTTP).to receive(:get).with(doc.download_url).and_return(doc_contents)
         with_stubbed_client(double("Octokit::Client", contents: [doc]), instance) do
           expect(instance.docs(repo_name)).to eq([
@@ -162,6 +164,8 @@ RSpec.describe GitHubRepoFetcher do
         dir = double("dir", type: "dir", path: "docs/foo")
         nested_doc = double("nested_doc", type: "file", path: "docs/foo/bar.md", download_url: "bar_url", html_url: "bar_html_url")
 
+        instance = github_repo_fetcher_returning(public_repo)
+        allow(instance).to receive(:latest_commit).and_return(commit)
         allow(HTTP).to receive(:get).with(nested_doc.download_url).and_return(doc_contents)
         stubbed_client = double("Octokit::Client")
         allow(stubbed_client).to receive(:contents).with("alphagov/#{repo_name}", path: "docs")
@@ -184,9 +188,7 @@ RSpec.describe GitHubRepoFetcher do
       end
 
       it "skips over any non-markdown files" do
-        instance = GitHubRepoFetcher.new
-        allow(instance).to receive(:repo).with(repo_name).and_return(public_repo)
-
+        instance = github_repo_fetcher_returning(public_repo)
         stubbed_client = double("Octokit::Client")
         allow(stubbed_client).to receive(:contents).with("alphagov/#{repo_name}", path: "docs")
           .and_return([double("non markdown file", type: "file", path: "docs/digests.png")])
@@ -198,17 +200,15 @@ RSpec.describe GitHubRepoFetcher do
     end
 
     it "returns nil if no docs folder exists" do
-      instance = GitHubRepoFetcher.new
+      instance = github_repo_fetcher_returning(public_repo)
       stub_request(:get, docs_url(repo_name))
         .to_return(status: 404, body: "{}", headers: { content_type: "application/json" })
-      allow(instance).to receive(:repo).with(repo_name).and_return(public_repo)
 
       expect(instance.docs(repo_name)).to be_nil
     end
 
     it "returns nil if the repo is private" do
-      instance = GitHubRepoFetcher.new
-      allow(instance).to receive(:repo).with(repo_name).and_return(private_repo)
+      instance = github_repo_fetcher_returning(private_repo)
 
       expect(instance.docs(repo_name)).to eq(nil)
     end
